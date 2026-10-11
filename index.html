@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.json?v=2026.10.11-6"><meta name="theme-color" content="#140a2e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Goji"><link rel="apple-touch-icon" href="icon.png?v=2026.10.11-6"><link rel="icon" href="icon-512.png"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="app-version" content="2026.10.11-6"><title>Goji Tracker</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.json?v=2026.10.11-7"><meta name="theme-color" content="#140a2e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Goji"><link rel="apple-touch-icon" href="icon.png?v=2026.10.11-7"><link rel="icon" href="icon-512.png"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="app-version" content="2026.10.11-7"><title>Goji Tracker</title>
 <style>
 :root{--bg:#0f1115;--card:#1a1d24;--txt:#e6e6e6;--mut:#8b93a1;--acc:#ff7a1a;--bd:#2a2f3a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,sans-serif;padding-bottom:70px}
@@ -18,7 +18,7 @@ button.g{background:#2a2f3a;color:var(--txt);border:0;border-radius:8px;padding:
 :root{--bg:#0b0716;--card:rgba(30,22,48,.55);--bd:rgba(255,255,255,.12);--txt:#fff;--mut:rgba(235,235,245,.6);--acc:#ff9f0a}
 html{background:#0b0716;-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;background:transparent;padding:env(safe-area-inset-top) calc(env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) env(safe-area-inset-left);-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;-webkit-tap-highlight-color:transparent;letter-spacing:-.01em}
-#bg{position:fixed;inset:0;z-index:-2;background:#140a2e url(skyline.svg?v=2026.10.11-6) center bottom/cover no-repeat}
+#bg{position:fixed;inset:0;z-index:-2;background:#140a2e url(skyline.svg?v=2026.10.11-7) center bottom/cover no-repeat}
 #bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,5,18,.72),rgba(8,5,18,.45) 45%,rgba(8,5,18,.75))}
 header{display:none}
 h1.lt{font-family:-apple-system,"SF Pro Display",system-ui,sans-serif;font-size:34px;font-weight:700;letter-spacing:.01em;margin:14px 4px 4px}
@@ -105,10 +105,10 @@ nav button{font-size:9.5px}nav button svg{width:24px;height:24px}.pill{display:i
 <div class="mut">Paste your private sync URL once (gist raw link). It stays on this device only.</div>
 <input id="syncUrl" type="url" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://gist.githubusercontent.com/…/raw/joe-data.json" style="margin:6px 0">
 <div class="row"><button class="b" onclick="setSync()">Save &amp; sync now</button><button class="g" onclick="syncNow(true)">Sync now</button></div><div class="mut" id="syncMsg"></div></div></div>
-<div class="card"><h3>Import</h3><button class="b" style="width:100%;margin-bottom:8px" onclick="corEl.click()">Import COROS CSV/JSON</button><button class="b" style="width:100%" onclick="crEl.click()">Import Cronometer CSV</button><div class="mut" style="margin-top:6px">Cronometer: pick dailysummary.csv, servings.csv and/or biometrics.csv (multiple OK).</div><input type="file" id="crEl" accept=".csv" multiple style="display:none"></div><div class="card"><h3>Backup &amp; export</h3><div class="row"><button class="g" onclick="expJSON()">Export JSON</button><button class="g" onclick="impEl.click()">Restore backup</button></div>
+<div class="card"><h3>Import</h3><button class="b" style="width:100%;margin-bottom:8px" onclick="corEl.click()">Import COROS CSV/JSON</button><button class="b" style="width:100%" onclick="crEl.click()">Import Cronometer CSV</button><div class="mut" style="margin-top:6px">Cronometer: pick dailysummary.csv, servings.csv and/or biometrics.csv (multiple OK).</div><input type="file" id="crEl" accept=".csv" multiple style="display:none"></div><div class="card"><h3>Lift templates</h3><button class="g" style="width:100%" onclick="restoreTemplates()">Restore default templates</button><div class="mut" style="margin-top:6px">Re-adds Full body Day 1 and Full Body Day 2 if they were deleted.</div></div><div class="card"><h3>Backup &amp; export</h3><div class="row"><button class="g" onclick="expJSON()">Export JSON</button><button class="g" onclick="impEl.click()">Restore backup</button></div>
 <div class="row"><button class="g" onclick="expCSV('lifts')">Lifts CSV</button><button class="g" onclick="expCSV('runs')">Runs CSV</button><button class="g" onclick="expCSV('body')">Body CSV</button></div>
 <input type="file" id="impEl" accept=".json" style="display:none"><input type="file" id="corEl" accept=".json,.csv" style="display:none"></div><div class="card"><details><summary><b>Nutrition targets</b> <span class="mut">(editable)</span></summary><div id="nTgt"></div><button class="g" onclick="D.targets=JSON.parse(JSON.stringify(TGT0));save()">Reset to defaults</button></details></div>
-<div class="mut" style="text-align:center;margin:16px 0">Goji Tracker v2026.10.11-6</div></section>
+<div class="mut" style="text-align:center;margin:16px 0">Goji Tracker v2026.10.11-7</div></section>
 <section id="body"><h1 class="lt">Body</h1><div class="card"><h3>Weight trend</h3><canvas id="cWt" height="160" style="width:100%"></canvas></div><div class="card"><h3>Body stats</h3>
 <div class="row"><input type="date" id="bDate"><input id="bWt" type="number" step="0.1" placeholder="Weight lbs"><input id="bBf" type="number" step="0.1" placeholder="Body fat %"></div>
 <button class="b" onclick="saveBody()">Save</button></div><div class="card"><table id="bTab"></table></div><div class="card"><h3>Daily biometrics</h3><table id="bioTab"></table></div></section>
@@ -147,7 +147,7 @@ function delT(){const id=$("tSel").value;if(id)delItem("templates",id)}
 function saveW(){if(cur.tpl)return saveT();const w={id:cur.id||uid(),date:$("wDate").value||today(),name:$("wName").value,note:$("wNote").value,ex:cur.ex.map(e=>({name:e.name,sets:e.sets.filter(s=>s.r||s.w).map(s=>({r:+s.r||0,w:+s.w||0,rpe:s.rpe===""?null:+s.rpe}))}))};
 D.lifts=D.lifts.filter(x=>x.id!==w.id);D.lifts.push(w);newW();save()}
 function editW(id){const w=D.lifts.find(x=>x.id===id);cur=JSON.parse(JSON.stringify(w));cur.ex.forEach(e=>e.sets.forEach(s=>{if(s.rpe==null)s.rpe=""}));$("wDate").value=w.date;$("wName").value=w.name;$("wNote").value=w.note;drawEx();scrollTo(0,0)}
-function delItem(k,id){if(confirm("Delete?")){D[k]=D[k].filter(x=>x.id!==id);if(id.startsWith("seed-")){const d=JSON.parse(localStorage.getItem(KEY+"-deleted")||"[]");d.push(id);localStorage.setItem(KEY+"-deleted",JSON.stringify(d))}save()}}
+function delItem(k,id){if(confirm("Delete?")){D[k]=D[k].filter(x=>x.id!==id);{const d=JSON.parse(localStorage.getItem(KEY+"-deleted")||"[]");if(!d.includes(id))d.push(id);localStorage.setItem(KEY+"-deleted",JSON.stringify(d))}save()}}
 function allEx(){return [...new Set([...PRE,...D.lifts.flatMap(w=>w.ex.map(e=>e.name))])]}
 function showHist(){const n=$("hSel").value;const ss=D.lifts.filter(w=>w.ex.some(e=>e.name===n)).sort((a,b)=>a.date<b.date?1:-1);
 if(!ss.length){$("hOut").innerHTML='<p class="mut">No sessions yet.</p>';return}
@@ -280,7 +280,13 @@ if(h.includes("Metric")){rows.forEach(r=>{const date=r.Day;if(!date||date<MIN_DA
 const val=key==="sleep"&&/hr:min/.test(r.Unit)?Math.floor(a)+Math.round(a%1*100)/60:key==="wt"&&/kg/.test(r.Unit)?a*2.20462:a;const id="cr-b-"+date;let b=D.bio.find(x=>x.id===id);if(!b){b={id,date};D.bio.push(b);n++}b[key]=+val.toFixed(2)});return [n,"biometrics"]}
 return [0,"unrecognized"]}
 const SK=KEY+"-sync";
-function syncMerge(d){let n=0;["lifts","runs","body","templates","servings"].forEach(k=>(d[k]||[]).forEach(x=>{D[k]=D[k]||[];if(x.id&&!D[k].some(y=>y.id===x.id)){D[k].push(x);n++}}));
+function tombs(){return JSON.parse(localStorage.getItem(KEY+"-deleted")||"[]")}
+function canAdd(k,x){if(!x||!x.id)return false;D[k]=D[k]||[];if(D[k].some(y=>y.id===x.id))return false;if(tombs().includes(x.id))return false;
+if(k==="templates"&&D.templates.some(t=>t.name===x.name&&JSON.stringify(t.ex)===JSON.stringify(x.ex)))return false;return true}
+function restoreTemplates(){let n=0;const td=tombs();SEED.templates.forEach(t=>{const id=t.id.replace(/-v2$/,"-v3"),c=JSON.parse(JSON.stringify(t));c.id=id;
+const i=td.indexOf(id);if(i>=0)td.splice(i,1);if(!D.templates.some(x=>x.name===c.name&&JSON.stringify(x.ex)===JSON.stringify(c.ex))&&!D.templates.some(x=>x.id===id)){D.templates.push(c);n++}});
+localStorage.setItem(KEY+"-deleted",JSON.stringify(td));save();alert(n?"Restored "+n+" template(s)":"Default templates are already present")}
+function syncMerge(d){let n=0;["lifts","runs","body","templates","servings"].forEach(k=>(d[k]||[]).forEach(x=>{if(canAdd(k,x)){D[k].push(x);n++}}));
 ["nutri","bio"].forEach(k=>(d[k]||[]).forEach(x=>{if(!x.id)return;const i=D[k].findIndex(y=>y.id===x.id);if(i<0){D[k].push(x);n++}else if(JSON.stringify(D[k][i])!==JSON.stringify(x)){D[k][i]=x;n++}}));return n}
 function syncCfg(){return JSON.parse(localStorage.getItem(SK)||"{}")}
 function syncStatus(){const c=syncCfg();$("syncStat").textContent=c.url?(c.last?"Last synced "+new Date(c.last).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"Not synced yet"):"Off";if(c.url&&!$("syncUrl").value)$("syncUrl").value=c.url}
@@ -326,7 +332,7 @@ if(k==="lifts"){rows=[["date","workout","exercise","set","reps","weight_lbs","rp
 else if(k==="runs"){rows=[["date","type","miles","duration","pace_per_mi","avg_hr","notes"]];D.runs.forEach(r=>rows.push([r.date,r.type,r.mi,fmt(r.sec),r.sec?fmt(r.sec/r.mi):"",r.hr,r.note]))}
 else{rows=[["date","weight_lbs","body_fat_pct"]];D.body.forEach(b=>rows.push([b.date,b.wt,b.bf]))}
 dl(k+".csv",rows.map(r=>r.map(q).join(",")).join("\n"),"text/csv")}
-function mergeData(d){let n=0;["lifts","runs","body","templates","nutri","servings","bio"].forEach(k=>(d[k]||[]).forEach(x=>{D[k]=D[k]||[];if(x.id&&!D[k].some(y=>y.id===x.id)){D[k].push(x);n++}}));return n}
+function mergeData(d){let n=0;["lifts","runs","body","templates","nutri","servings","bio"].forEach(k=>(d[k]||[]).forEach(x=>{if(canAdd(k,x)){D[k].push(x);n++}}));return n}
 function corosCSV(t){const L=t.trim().split(/\r?\n/).map(l=>l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(c=>c.replace(/,$/,"").replace(/^"|"$/g,"").replace(/""/g,'"')));const h=L[0].map(x=>x.toLowerCase().trim()),f=(...n)=>h.findIndex(x=>n.some(k=>x.includes(k)));
 const iD=f("date"),iT=f("sport","activity type","type"),iDi=f("distance"),iDu=f("time","duration"),iH=f("avg hr","average heart","avg heart","heart"),iN=f("title","name");const out={runs:[],lifts:[]};
 L.slice(1).forEach(c=>{if(!c[iD])return;const dt=new Date(c[iD]);if(isNaN(dt))return;const date=dt.toLocaleDateString("en-CA"),ty=(c[iT]||"").toLowerCase(),sec=parseDur(c[iDu]||"0"),hr=+c[iH]||null;
