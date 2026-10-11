@@ -17,14 +17,15 @@ button.g{background:#2a2f3a;color:var(--txt);border:0;border-radius:8px;padding:
 </style></head><body>
 <header>🏃 Goji Tracker <span class="mut">Austin Marathon · sub-4:30</span></header>
 <section id="dash" class="on">
-<div class="grid"><div class="card"><div class="mut">Days to race</div><div class="big" id="dDays"></div></div>
-<div class="card"><div class="mut">Miles this week</div><div class="big" id="dWeek"></div></div></div>
-<div class="card"><h3>Weekly schedule</h3><table id="sched"></table></div>
-<div class="card"><h3>Weekly mileage</h3><canvas id="cMiles" height="160" style="width:100%"></canvas></div>
+<div class="card"><div class="row"><div><div class="mut">Days to race</div><div class="big" id="dDays"></div></div><div style="text-align:right"><div class="mut" id="wkLbl"></div><div><b id="dWeek"></b> <span class="mut" id="dPlan"></span></div></div></div>
+<div style="background:#0b0d11;border-radius:6px;height:12px;overflow:hidden;margin-top:6px"><div id="pBar" style="height:100%;background:var(--acc);width:0"></div></div></div>
+<div class="card" id="nextCard"></div>
+<div class="card"><h3>This week</h3><div id="sched"></div></div>
+<div class="card"><h3>Running · last 12 weeks</h3><canvas id="cMiles" height="160" style="width:100%"></canvas><div class="grid" id="sum12" style="margin-top:8px"></div></div>
 <div class="card"><h3>Weight trend</h3><canvas id="cWt" height="160" style="width:100%"></canvas></div>
-<div class="card"><h3>Data</h3><div class="row"><button class="g" onclick="expJSON()">Export JSON</button><button class="g" onclick="impEl.click()">Import JSON</button></div>
+<div class="card"><h3>Data</h3><div class="row"><button class="b" onclick="corEl.click()">Import COROS CSV/JSON</button></div><div class="row"><button class="g" onclick="expJSON()">Export JSON</button><button class="g" onclick="impEl.click()">Restore backup</button></div>
 <div class="row"><button class="g" onclick="expCSV('lifts')">Lifts CSV</button><button class="g" onclick="expCSV('runs')">Runs CSV</button><button class="g" onclick="expCSV('body')">Body CSV</button></div>
-<input type="file" id="impEl" accept=".json" style="display:none"></div></section>
+<input type="file" id="impEl" accept=".json" style="display:none"><input type="file" id="corEl" accept=".json,.csv" style="display:none"></div></section>
 <section id="lift"><div class="card"><h3>Templates</h3><select id="tSel"></select>
 <div class="row"><button class="b" onclick="startT()">Start session</button><button class="g" onclick="editT()">Edit</button><button class="x" onclick="delT()">✕</button></div>
 <div class="mut">New template: build exercises below, then "Save as template".</div></div>
@@ -101,11 +102,25 @@ c.fillText(mx.toFixed(1),0,12);c.fillText(mn.toFixed(bar?0:1),0,H-pb);c.fillStyl
 vals.forEach((v,i)=>{const x=pl+i*w,y=H-pb-(v-mn)/rg*(H-pb-15);if(bar)c.fillRect(x+3,y,w-6,H-pb-y);else{i?c.lineTo(x+w/2,y):c.moveTo(x+w/2,y);c.fillRect(x+w/2-2,y-2,4,4)}});if(!bar)c.stroke();
 c.fillStyle="#8b93a1";labels.forEach((l,i)=>{if(vals.length<=8||i%Math.ceil(vals.length/8)==0)c.fillText(l,pl+i*w+2,H-5)})}
 const monday=d=>{const x=new Date(d+"T12:00");x.setDate(x.getDate()-(x.getDay()+6)%7);return x.toLocaleDateString("en-CA")};
-const SCH=[["Sun","Full body Day 1 (lift)"],["Mon","Easy run"],["Tue","Speed run"],["Wed","Full Body Day 2 (lift)"],["Thu","Tempo run"],["Fri","Rest"],["Sat","Long run"]];
-function render(){const dw=new Date().getDay();$("sched").innerHTML=SCH.map((x,i)=>`<tr style="${i===dw?"color:var(--acc);font-weight:700":""}"><td>${x[0]}</td><td>${x[1]}</td></tr>`).join("");
+const PLAN=[["2026-10-05",17,"4E (Wed re-entry)","5 incl. 8 x 30s quick / 90s E","—","8E"],["2026-10-12",25,"5E","5 incl. 6 x 45s fast / 75s E","6 incl. 15 min tempo","9E"],["2026-10-19",27,"5E","6 incl. 6 x 45s fast / 75s E","6 incl. 15 min tempo","10E"],["2026-10-26",27,"5E","6 incl. 6 x 1 min fast / 90s E","6 incl. 2 x 8 min tempo","10E"],["2026-11-02",30,"6E","6 incl. 8 x 60s fast / 90s E","7 incl. 20 min tempo","11E"],["2026-11-09",33,"6E","7 incl. 5 x 2 min strong / 2 min E","8 incl. 2 x 10 min tempo","12E"],["2026-11-16",26,"5E","6E + 6 strides","6 incl. 12 min tempo","9E"],["2026-11-23",34,"6E","7 incl. 6 x 2 min 10K effort / 2 min E","8 incl. 3 x 8 min tempo","13E"],["2026-11-30",37,"7E","7 incl. 5 x 3 min 10K effort / 2 min E","9 incl. 25 min tempo","14E"],["2026-12-07",40,"7E","8 incl. 6 x 800m 10K effort / 400m jog","10 incl. 2 x 15 min tempo","15E; final 2 mi steady"],["2026-12-14",32,"6E","7E + 6 strides","8 incl. 15 min tempo","11E"],["2026-12-21",41,"7E","8 incl. 8 x 90s 10K effort / 90s E","10 incl. 3 mi tempo","16E"],["2026-12-28",43,"7E","9 incl. 5 x 4 min 10K effort / 2 min E","10 incl. 2 x 2 mi tempo","17E"],["2027-01-04",45,"8E","9 incl. 5 x 1 km 10K effort / 2 min E","10 incl. 4 mi tempo","18E"],["2027-01-11",35,"6E","7 incl. 6 x 45s quick / 75s E","9 incl. 20 min tempo","13E"],["2027-01-18",45,"8E","9 incl. 5 x 3 min 10K effort / 2 min E","10 incl. 3 x 10 min tempo","18E"],["2027-01-25",47,"8E","8 incl. 6 x 1 min quick / 90s E","8 incl. 2 x 8 min tempo","23E (PEAK)"],["2027-02-01",26,"5E","5 incl. 6 x 1 min quick / 90s E","6 incl. 10 min tempo","10E"],["2027-02-08",35.2,"4E","3E + 4 x 20s strides","2 incl. 5 min controlled tempo","REST"]];
+const addD=(d,n)=>{const x=new Date(d+"T12:00");x.setDate(x.getDate()+n);return x.toLocaleDateString("en-CA")};
+const DN=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+function weekTasks(mon){const pi=PLAN.findIndex(w=>w[0]===mon),P=PLAN[pi];const r=(t,k)=>({kind:"run",title:t+" run",detail:P?P[k]:""});
+const t=[r("Easy",2),r("Speed",3),{kind:"lift",title:"Full Body Day 2 (lift)",detail:""},r("Tempo",4),{kind:"rest",title:"Rest",detail:""},r("Long",5),{kind:"lift",title:"Full body Day 1 (lift)",detail:""}];
+if(pi===PLAN.length-1){t[4].detail="Rest";t[5]={kind:"rest",title:"Rest",detail:"Rest before race"};t[6]={kind:"race",title:"🏁 Austin Marathon",detail:"26.2 · goal sub-4:30"}}
+return t.map((x,i)=>({...x,date:addD(mon,i),day:DN[i],week:pi>=0?pi+2:null,plan:P?P[1]:null}))}
+function toggleDone(d,v){D.done=D.done||{};if(v)D.done[d]=1;else delete D.done[d];save()}
+function nextTask(){let m=monday(today());for(let k=0;k<30;k++){const t=weekTasks(m).find(x=>x.date>=today()&&x.kind!=="rest"&&!(D.done||{})[x.date]);if(t)return t;m=addD(m,7)}}
+function render(){const T0=today(),mon=monday(T0),wt=weekTasks(mon),dn=D.done||{};
+const wm=D.runs.filter(r=>monday(r.date)===mon).reduce((a,r)=>a+r.mi,0),pl=wt[0].plan;$("wkLbl").textContent=(wt[0].week?"Week "+wt[0].week+" · ":"")+mon.slice(5)+" to "+addD(mon,6).slice(5);
+$("dWeek").textContent=wm.toFixed(1)+" mi";$("dPlan").textContent=pl?"/ "+pl+" planned":"";$("pBar").style.width=pl?Math.min(100,wm/pl*100)+"%":"0";
+const nt=nextTask();$("nextCard").innerHTML=nt?`<div class="mut">${nt.date===T0?"Today":"Next"} · ${nt.day} ${nt.date.slice(5)}</div><label class="row" style="font-size:18px"><input type="checkbox" id="nextChk" style="flex:0 0 26px;height:26px" onchange="toggleDone('${nt.date}',this.checked)"><b>${nt.title}</b></label><div>${esc(nt.detail)}</div>`:"<b>Plan complete 🎉</b>";
+$("sched").innerHTML=wt.map(x=>`<label class="row" style="${x.date===T0?"color:var(--acc);font-weight:700":""}"><input type="checkbox" style="flex:0 0 22px" ${dn[x.date]?"checked":""} ${x.kind==="rest"?"disabled":""} onchange="toggleDone('${x.date}',this.checked)"><span style="flex:0 0 40px">${x.day}</span><span>${x.title}${x.detail?` <span class="mut">· ${esc(x.detail)}</span>`:""}</span></label>`).join("");
+
 const tv=$("tSel").value;$("tSel").innerHTML=D.templates.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");if(tv&&D.templates.some(t=>t.id===tv))$("tSel").value=tv;const now=new Date();now.setHours(0,0,0,0);$("dDays").textContent=Math.max(0,Math.round((RACE-now)/864e5));
-const wk={};D.runs.forEach(r=>{const k=monday(r.date);wk[k]=(wk[k]||0)+r.mi});$("dWeek").textContent=(wk[monday(today())]||0).toFixed(1);
-const ks=Object.keys(wk).sort().slice(-12);chart($("cMiles"),ks.map(k=>k.slice(5)),ks.map(k=>wk[k]),1);
+const wk={};D.runs.forEach(r=>{const k=monday(r.date);wk[k]=(wk[k]||0)+r.mi});
+const ks=Array.from({length:12},(_,i)=>addD(monday(today()),(i-11)*7));const r12=D.runs.filter(r=>r.date>=ks[0]),tm=r12.reduce((a,r)=>a+r.mi,0),ts=r12.reduce((a,r)=>a+r.sec,0),hs=r12.filter(r=>r.hr&&r.sec),hsec=hs.reduce((a,r)=>a+r.sec,0);
+$("sum12").innerHTML=[["Total miles",tm.toFixed(1)],["Runs",r12.length],["Avg pace",tm&&ts?fmt(ts/tm)+"/mi":"—"],["Avg HR",hsec?Math.round(hs.reduce((a,r)=>a+r.hr*r.sec,0)/hsec):"—"]].map(x=>`<div><div class="mut">${x[0]}</div><b>${x[1]}</b></div>`).join("");chart($("cMiles"),ks.map(k=>k.slice(5)),ks.map(k=>wk[k]||0),1);
 const bs=[...D.body].sort((a,b)=>a.date<b.date?-1:1);chart($("cWt"),bs.map(b=>b.date.slice(5)),bs.map(b=>b.wt),0);
 $("exPre").innerHTML=allEx().map(n=>`<option value="${esc(n)}">`).join("");const hv=$("hSel").value;$("hSel").innerHTML=allEx().map(n=>`<option>${esc(n)}</option>`).join("");if(hv)$("hSel").value=hv;showHist();
 $("wList").innerHTML=[...D.lifts].sort((a,b)=>a.date<b.date?1:-1).map(w=>`<div class="card"><div class="row"><b>${w.date} · ${esc(w.name)}</b><button class="g" style="flex:0" onclick="editW('${w.id}')">Edit</button><button class="x" onclick="delItem('lifts','${w.id}')">✕</button></div>${w.note?`<div class="mut">${esc(w.note)}</div>`:""}${w.ex.map(e=>`<div>${esc(e.name)}: ${e.sets.map(s=>s.r+"×"+s.w).join(", ")}</div>`).join("")}</div>`).join("");
@@ -118,6 +133,13 @@ if(k==="lifts"){rows=[["date","workout","exercise","set","reps","weight_lbs","rp
 else if(k==="runs"){rows=[["date","type","miles","duration","pace_per_mi","avg_hr","notes"]];D.runs.forEach(r=>rows.push([r.date,r.type,r.mi,fmt(r.sec),r.sec?fmt(r.sec/r.mi):"",r.hr,r.note]))}
 else{rows=[["date","weight_lbs","body_fat_pct"]];D.body.forEach(b=>rows.push([b.date,b.wt,b.bf]))}
 dl(k+".csv",rows.map(r=>r.map(q).join(",")).join("\n"),"text/csv")}
-$("impEl").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!d.lifts||!d.runs||!d.body)throw 0;d.templates=d.templates||[];D=d;save();alert("Imported")}catch{alert("Invalid file")}})};
+function mergeData(d){let n=0;["lifts","runs","body","templates"].forEach(k=>(d[k]||[]).forEach(x=>{D[k]=D[k]||[];if(x.id&&!D[k].some(y=>y.id===x.id)){D[k].push(x);n++}}));return n}
+function corosCSV(t){const L=t.trim().split(/\r?\n/).map(l=>l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(c=>c.replace(/,$/,"").replace(/^"|"$/g,"").replace(/""/g,'"')));const h=L[0].map(x=>x.toLowerCase().trim()),f=(...n)=>h.findIndex(x=>n.some(k=>x.includes(k)));
+const iD=f("date"),iT=f("sport","activity type","type"),iDi=f("distance"),iDu=f("time","duration"),iH=f("avg hr","average heart","avg heart","heart"),iN=f("title","name");const out={runs:[],lifts:[]};
+L.slice(1).forEach(c=>{if(!c[iD])return;const dt=new Date(c[iD]);if(isNaN(dt))return;const date=dt.toLocaleDateString("en-CA"),ty=(c[iT]||"").toLowerCase(),sec=parseDur(c[iDu]||"0"),hr=+c[iH]||null;
+if(/strength|gym|lift/.test(ty))out.lifts.push({id:"coros-l-"+date+"-"+sec,date,name:c[iN]||"Strength",note:"COROS import · "+fmt(sec)+(hr?" · HR "+hr:""),ex:[]});
+else{let mi=parseFloat(String(c[iDi]).replace(/[^\d.]/g,""))||0;if(/km/i.test(h[iDi]))mi/=1.609;if(!mi)return;mi=+mi.toFixed(2);out.runs.push({id:"coros-r-"+date+"-"+mi,date,type:mi>=7?"long":"easy",mi,sec,hr,note:"COROS import"})}});return out}
+$("corEl").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=/\.csv$/i.test(f.name)?corosCSV(t):JSON.parse(t);const n=mergeData(d);save();alert("Imported "+n+" new item(s)")}catch(x){alert("Could not read file")}});e.target.value=""};
+$("impEl").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!d.lifts||!d.runs||!d.body)throw 0;d.templates=d.templates||[];d.done=d.done||{};D=d;save();alert("Imported")}catch{alert("Invalid file")}})};
 $("rDate").value=$("bDate").value=today();newW();save();addEventListener("resize",render);
 </script></body></html>
