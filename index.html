@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.json?v=2026.10.11-5"><meta name="theme-color" content="#140a2e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Goji"><link rel="apple-touch-icon" href="icon.png?v=2026.10.11-5"><link rel="icon" href="icon-512.png"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="app-version" content="2026.10.11-5"><title>Goji Tracker</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.json?v=2026.10.11-6"><meta name="theme-color" content="#140a2e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Goji"><link rel="apple-touch-icon" href="icon.png?v=2026.10.11-6"><link rel="icon" href="icon-512.png"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta name="app-version" content="2026.10.11-6"><title>Goji Tracker</title>
 <style>
 :root{--bg:#0f1115;--card:#1a1d24;--txt:#e6e6e6;--mut:#8b93a1;--acc:#ff7a1a;--bd:#2a2f3a}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,sans-serif;padding-bottom:70px}
@@ -18,7 +18,7 @@ button.g{background:#2a2f3a;color:var(--txt);border:0;border-radius:8px;padding:
 :root{--bg:#0b0716;--card:rgba(30,22,48,.55);--bd:rgba(255,255,255,.12);--txt:#fff;--mut:rgba(235,235,245,.6);--acc:#ff9f0a}
 html{background:#0b0716;-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,sans-serif;background:transparent;padding:env(safe-area-inset-top) calc(env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) env(safe-area-inset-left);-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;-webkit-tap-highlight-color:transparent;letter-spacing:-.01em}
-#bg{position:fixed;inset:0;z-index:-2;background:#140a2e url(skyline.svg?v=2026.10.11-5) center bottom/cover no-repeat}
+#bg{position:fixed;inset:0;z-index:-2;background:#140a2e url(skyline.svg?v=2026.10.11-6) center bottom/cover no-repeat}
 #bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,5,18,.72),rgba(8,5,18,.45) 45%,rgba(8,5,18,.75))}
 header{display:none}
 h1.lt{font-family:-apple-system,"SF Pro Display",system-ui,sans-serif;font-size:34px;font-weight:700;letter-spacing:.01em;margin:14px 4px 4px}
@@ -36,6 +36,23 @@ input[type=checkbox]{flex:0 0 28px!important;width:28px;height:28px;min-height:2
 input[type=checkbox]:checked{background:#30d158;border-color:#30d158}
 input[type=checkbox]:checked::before{content:"";width:12px;height:7px;border:solid #fff;border-width:0 0 3px 3px;transform:translateY(-2px) rotate(-45deg)}
 input[type=checkbox]:disabled{opacity:.25}
+#sched label.done{background:rgba(48,209,88,.16);border-radius:10px;padding-left:6px;padding-right:6px}#sched label.done>span{color:#d8ffe1}
+#todayWrap .card{overflow:hidden;transition:max-height .45s ease,opacity .45s ease,margin .45s ease,padding .45s ease;position:relative}
+#todayWrap .collapse{max-height:0!important;opacity:0;margin:0;padding-top:0;padding-bottom:0}
+.tsType{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--acc)}.tsTitle{font-size:22px;font-weight:700;margin:2px 0 4px}
+.doneBtn{width:100%;min-height:56px!important;font-size:18px!important;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;position:relative}
+.ckWrap{position:absolute;inset:0;display:none;place-items:center;background:rgba(10,30,15,.55);z-index:3}.ckWrap.on{display:grid}
+.ckWrap svg{width:96px;height:96px}.ckWrap circle{stroke:#30d158;stroke-width:5;fill:none;stroke-dasharray:283;stroke-dashoffset:283;animation:ckd .45s ease-out forwards}
+.ckWrap path{stroke:#fff;stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:80;stroke-dashoffset:80;animation:ckd .35s .35s ease-out forwards}
+@keyframes ckd{to{stroke-dashoffset:0}}
+.burst{position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:2px;pointer-events:none;animation:bst .9s ease-out forwards;z-index:4}
+@keyframes bst{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) rotate(var(--r)) scale(.4);opacity:0}}
+.ring{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;border:4px solid #30d158;animation:rng .7s ease-out forwards;z-index:3}
+@keyframes rng{to{transform:scale(2.6);opacity:0}}
+.donePill{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px auto;padding:10px 16px;border-radius:22px;background:rgba(48,209,88,.2);border:.5px solid rgba(48,209,88,.5);color:#d8ffe1;font-weight:600;width:fit-content;animation:pin .35s ease-out}
+.donePill button{background:none;border:0;color:var(--acc);font-weight:700;font-size:16px;min-height:44px;padding:0 6px;font-family:inherit}
+@keyframes pin{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){#todayWrap .card,.donePill{transition:none;animation:none}}
 #sched .wkSep{border-top:2px solid rgba(255,159,10,.55)!important;margin-top:4px}#sched label{min-height:44px;border-bottom:.5px solid var(--bd)}#sched label:last-child{border:0}
 td,th{border-bottom:.5px solid var(--bd)}
 .big{color:var(--acc)}
@@ -55,7 +72,7 @@ nav button{font-size:9.5px}nav button svg{width:24px;height:24px}.pill{display:i
 <section id="dash" class="on"><h1 class="lt">Home</h1><div class="card" id="goalSum" onclick="openGoals()"></div>
 <div class="card" id="wkCard" onclick="openGoals((activeGoal()||{}).id)"><div class="row" style="margin:0"><h3 style="margin:0" id="wkTitle"></h3></div><div class="row" style="margin:4px 0 0"><span class="mut" id="wkLbl"></span><span style="text-align:right"><b id="dWeek"></b> <span class="mut" id="dPlan"></span></span></div>
 <div class="bar" style="height:12px;border-radius:6px"><div id="pBar" style="width:0;background:var(--acc)"></div></div></div>
-<div class="card" id="homeFood" onclick="document.querySelector('nav [data-s=food]').click()"></div>
+<div id="todayWrap"></div><div class="card" id="homeFood" onclick="document.querySelector('nav [data-s=food]').click()"></div>
 <div class="card"><h3>Next 7 days</h3><div id="sched"></div></div>
 </section>
 <section id="goals"><h1 class="lt">Goals</h1><div id="gMain"></div></section>
@@ -91,7 +108,7 @@ nav button{font-size:9.5px}nav button svg{width:24px;height:24px}.pill{display:i
 <div class="card"><h3>Import</h3><button class="b" style="width:100%;margin-bottom:8px" onclick="corEl.click()">Import COROS CSV/JSON</button><button class="b" style="width:100%" onclick="crEl.click()">Import Cronometer CSV</button><div class="mut" style="margin-top:6px">Cronometer: pick dailysummary.csv, servings.csv and/or biometrics.csv (multiple OK).</div><input type="file" id="crEl" accept=".csv" multiple style="display:none"></div><div class="card"><h3>Backup &amp; export</h3><div class="row"><button class="g" onclick="expJSON()">Export JSON</button><button class="g" onclick="impEl.click()">Restore backup</button></div>
 <div class="row"><button class="g" onclick="expCSV('lifts')">Lifts CSV</button><button class="g" onclick="expCSV('runs')">Runs CSV</button><button class="g" onclick="expCSV('body')">Body CSV</button></div>
 <input type="file" id="impEl" accept=".json" style="display:none"><input type="file" id="corEl" accept=".json,.csv" style="display:none"></div><div class="card"><details><summary><b>Nutrition targets</b> <span class="mut">(editable)</span></summary><div id="nTgt"></div><button class="g" onclick="D.targets=JSON.parse(JSON.stringify(TGT0));save()">Reset to defaults</button></details></div>
-<div class="mut" style="text-align:center;margin:16px 0">Goji Tracker v2026.10.11-5</div></section>
+<div class="mut" style="text-align:center;margin:16px 0">Goji Tracker v2026.10.11-6</div></section>
 <section id="body"><h1 class="lt">Body</h1><div class="card"><h3>Weight trend</h3><canvas id="cWt" height="160" style="width:100%"></canvas></div><div class="card"><h3>Body stats</h3>
 <div class="row"><input type="date" id="bDate"><input id="bWt" type="number" step="0.1" placeholder="Weight lbs"><input id="bBf" type="number" step="0.1" placeholder="Body fat %"></div>
 <button class="b" onclick="saveBody()">Save</button></div><div class="card"><table id="bTab"></table></div><div class="card"><h3>Daily biometrics</h3><table id="bioTab"></table></div></section>
@@ -270,13 +287,28 @@ function syncStatus(){const c=syncCfg();$("syncStat").textContent=c.url?(c.last?
 function setSync(){const u=$("syncUrl").value.trim();if(u&&!/^https:\/\/gist\.githubusercontent\.com\/[^/]+\/[0-9a-f]+\/raw\/[^/]+\.json$/i.test(u))return $("syncMsg").textContent="Use the raw URL without a commit id: https://gist.githubusercontent.com/<user>/<id>/raw/joe-data.json";
 const c=syncCfg();c.url=u;localStorage.setItem(SK,JSON.stringify(c));if(u)syncNow(true);else syncStatus()}
 async function syncNow(show){const c=syncCfg();if(!c.url)return;try{const r=await fetch(c.url+"?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const d=await r.json();const n=syncMerge(d);c.last=Date.now();localStorage.setItem(SK,JSON.stringify(c));save();if(show)$("syncMsg").textContent=n+" new/updated item(s)";}catch(e){$("syncMsg").textContent="Sync failed: "+e.message}syncStatus()}
-function render(){raceCountdown();renderGoals();syncStatus();{const td=today(),dy=D.nutri.find(x=>x.date===td),t=tgtFor(td),k=nv(dy,"kcal"),p=nv(dy,"prot");$("homeFood").innerHTML=`<h3>Today's nutrition${new Date(td+"T12:00").getDay()===0?' <span class="mut">(Sunday targets)</span>':""}</h3>`+bar("Calories",k,t.kcal," kcal")+bar("Protein",p,t.prot,"g")+bar("Net carbs",nv(dy,"nc"),t.nc,"g")+bar("Fat",nv(dy,"fat"),t.fat,"g")}
+function todayTask(){const T0=today();return activeGoal()?weekTasks(monday(T0))[(new Date(T0+"T12:00").getDay()+6)%7]:null}
+function renderToday(){const el=$("todayWrap");if(!el)return;const t=todayTask(),dn=D.done||{};if(!t){el.innerHTML="";return}
+if(t.kind==="rest"){el.innerHTML=`<div class="card"><div class="tsType">Today</div><div class="tsTitle">😌 Rest day</div><div class="mut">${esc(t.detail||"Recover, hydrate, sleep. You earned it.")}</div></div>`;return}
+if(dn[t.date]){el.innerHTML=`<div class="donePill">✓ Session completed · <button onclick="undoToday()">Undo</button></div>`;return}
+let extra="";if(t.kind==="lift"){const tl=t.title.toLowerCase(),tp=D.templates.find(x=>tl.includes(x.name.toLowerCase()));extra=tp?`<div class="mut">Template: <b style="color:var(--txt)">${esc(tp.name)}</b> · ${tp.ex.length} exercises</div>`:""}
+const ty={run:"Run",lift:"Strength",race:"Race",other:"Session"}[t.kind]||"Session";
+el.innerHTML=`<div class="card" id="todayCard"><div class="tsType">Today's training session · ${ty}</div><div class="tsTitle">${esc(t.title)}</div>${t.detail?`<div>${esc(t.detail)}</div>`:""}${extra}<button class="b doneBtn" id="doneBtn" onclick="completeToday()">✓ Tap to complete</button><div class="ckWrap" id="ckWrap"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/><path d="M30 52 L44 66 L71 37"/></svg></div></div>`}
+function completeToday(){const t=todayTask();if(!t)return;const c=$("todayCard"),red=matchMedia("(prefers-reduced-motion: reduce)").matches;
+try{navigator.vibrate&&navigator.vibrate([18,40,28])}catch(e){}
+if(red){toggleDone(t.date,true);return}
+$("doneBtn").disabled=true;$("ckWrap").classList.add("on");const ring=document.createElement("div");ring.className="ring";c.appendChild(ring);
+const cols=["#30d158","#ff9f0a","#ffd60a","#ff375f","#0a84ff","#fff"];for(let i=0;i<28;i++){const b=document.createElement("span"),a=Math.random()*Math.PI*2,r=70+Math.random()*110;b.className="burst";b.style.background=cols[i%cols.length];b.style.setProperty("--x",Math.cos(a)*r+"px");b.style.setProperty("--y",Math.sin(a)*r+"px");b.style.setProperty("--r",(Math.random()*540-270)+"deg");c.appendChild(b)}
+setTimeout(()=>{c.style.maxHeight=c.scrollHeight+"px";requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add("collapse")))},950);
+setTimeout(()=>toggleDone(t.date,true),1450)}
+function undoToday(){const t=todayTask();if(t)toggleDone(t.date,false)}
+function render(){raceCountdown();renderToday();renderGoals();syncStatus();{const td=today(),dy=D.nutri.find(x=>x.date===td),t=tgtFor(td),k=nv(dy,"kcal"),p=nv(dy,"prot");$("homeFood").innerHTML=`<h3>Today's nutrition${new Date(td+"T12:00").getDay()===0?' <span class="mut">(Sunday targets)</span>':""}</h3>`+bar("Calories",k,t.kcal," kcal")+bar("Protein",p,t.prot,"g")+bar("Net carbs",nv(dy,"nc"),t.nc,"g")+bar("Fat",nv(dy,"fat"),t.fat,"g")}
 if(!$("nDate").value)$("nDate").value=today();renderFood();
 $("bioTab").innerHTML="<tr><th>Date</th><th>Rest HR</th><th>Sleep</th><th>Weight</th></tr>"+[...D.bio].sort((a,b)=>a.date<b.date?1:-1).map(b=>`<tr><td>${b.date.slice(5)}</td><td>${b.rhr??""}</td><td>${b.sleep!=null?Math.floor(b.sleep)+"h "+String(Math.round(b.sleep%1*60)).padStart(2,"0")+"m":""}</td><td>${b.wt!=null?(+b.wt).toFixed(1):""}</td></tr>`).join("");const T0=today(),mon=monday(T0),wt=weekTasks(mon),dn=D.done||{};
 const wm=D.runs.filter(r=>monday(r.date)===mon).reduce((a,r)=>a+r.mi,0),pl=wt[0].plan;{const g=activeGoal(),ph=g&&wt[0].week&&phaseOf(g,wt[0].week);$("wkCard").style.display=g?"":"none";$("wkTitle").textContent=g?(wt[0].week?`Week ${wt[0].week} of ${g.block.weeks}${ph?" · "+ph.name:""}`:(goalWeek(g,T0)<1?g.title+" starts "+g.start:g.title)):"";}$("wkLbl").textContent=mon.slice(5)+" to "+addD(mon,6).slice(5);
 $("dWeek").textContent=wm.toFixed(1)+" mi";$("dPlan").textContent=pl?"/ "+pl+" planned":"";$("pBar").style.width=pl?Math.min(100,wm/pl*100)+"%":"0";
 {const days=[];for(let k=0;k<7;k++){const d=addD(T0,k);days.push(weekTasks(monday(d))[(new Date(d+"T12:00").getDay()+6)%7])}
-$("sched").innerHTML=days.map((x,k)=>`<label class="row${k&&x.day==="Sun"?" wkSep":""}" style="${x.date===T0?"color:var(--acc);font-weight:700":""}"><input type="checkbox" ${dn[x.date]?"checked":""} ${x.kind==="rest"?"disabled":""} onchange="toggleDone('${x.date}',this.checked)"><span style="flex:0 0 74px">${k===0?"Today":x.day} <span class="mut" style="font-weight:400">${new Date(x.date+"T12:00").toLocaleDateString([], {month:"short",day:"numeric"})}</span></span><span>${esc(x.title)}${x.detail?` <span class="mut">· ${esc(x.detail)}</span>`:""}</span></label>`).join("")}
+$("sched").innerHTML=days.map((x,k)=>`<label class="row${k&&x.day==="Sun"?" wkSep":""}${dn[x.date]?" done":""}" style="${x.date===T0?"color:var(--acc);font-weight:700":""}"><input type="checkbox" ${dn[x.date]?"checked":""} ${x.kind==="rest"?"disabled":""} onchange="toggleDone('${x.date}',this.checked)"><span style="flex:0 0 74px">${k===0?"Today":x.day} <span class="mut" style="font-weight:400">${new Date(x.date+"T12:00").toLocaleDateString([], {month:"short",day:"numeric"})}</span></span><span>${esc(x.title)}${x.detail?` <span class="mut">· ${esc(x.detail)}</span>`:""}</span></label>`).join("")}
 
 const tv=$("tSel").value;$("tSel").innerHTML=D.templates.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");if(tv&&D.templates.some(t=>t.id===tv))$("tSel").value=tv;
 const wk={};D.runs.forEach(r=>{const k=monday(r.date);wk[k]=(wk[k]||0)+r.mi});
