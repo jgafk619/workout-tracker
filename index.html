@@ -59,6 +59,10 @@ nav button{font-size:10px}
 <div class="card"><h3>This week</h3><div id="sched"></div></div>
 <div class="card"><h3>Running · last 12 weeks</h3><canvas id="cMiles" height="160" style="width:100%"></canvas><div class="grid" id="sum12" style="margin-top:8px"></div></div>
 <div class="card"><h3>Weight trend</h3><canvas id="cWt" height="160" style="width:100%"></canvas></div>
+<div class="card"><h3>Settings</h3><details id="syncBox"><summary><b>Sync</b> <span class="mut" id="syncStat"></span></summary>
+<div class="mut">Paste your private sync URL once (gist raw link). It stays on this device only.</div>
+<input id="syncUrl" type="url" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://gist.githubusercontent.com/…/raw/joe-data.json" style="margin:6px 0">
+<div class="row"><button class="b" onclick="setSync()">Save &amp; sync now</button><button class="g" onclick="syncNow(true)">Sync now</button></div><div class="mut" id="syncMsg"></div></details></div>
 <div class="card"><h3>Data</h3><div class="row"><button class="b" onclick="corEl.click()">Import COROS CSV/JSON</button></div><div class="row"><button class="g" onclick="expJSON()">Export JSON</button><button class="g" onclick="impEl.click()">Restore backup</button></div>
 <div class="row"><button class="g" onclick="expCSV('lifts')">Lifts CSV</button><button class="g" onclick="expCSV('runs')">Runs CSV</button><button class="g" onclick="expCSV('body')">Body CSV</button></div>
 <input type="file" id="impEl" accept=".json" style="display:none"><input type="file" id="corEl" accept=".json,.csv" style="display:none"></div></section>
@@ -186,7 +190,15 @@ if(h.includes("Food Name")){const g=(r,...ks)=>{for(const k of ks){const kk=h.fi
 if(h.includes("Metric")){rows.forEach(r=>{const date=r.Day;if(!date||date<MIN_DATE)return;const m=r.Metric,a=+r.Amount;let key=/^Resting Heart Rate/.test(m)?"rhr":/^Sleep/.test(m)?"sleep":/^Weight/.test(m)?"wt":null;if(!key||isNaN(a))return;
 const val=key==="sleep"&&/hr:min/.test(r.Unit)?Math.floor(a)+Math.round(a%1*100)/60:key==="wt"&&/kg/.test(r.Unit)?a*2.20462:a;const id="cr-b-"+date;let b=D.bio.find(x=>x.id===id);if(!b){b={id,date};D.bio.push(b);n++}b[key]=+val.toFixed(2)});return [n,"biometrics"]}
 return [0,"unrecognized"]}
-function render(){raceCountdown();{const td=today(),dy=D.nutri.find(x=>x.date===td),t=tgtFor(td),k=nv(dy,"kcal"),p=nv(dy,"prot");$("homeFood").innerHTML=`<h3>Today's nutrition</h3>`+bar("Calories",k,t.kcal," kcal")+bar("Protein",p,t.prot,"g")}
+const SK=KEY+"-sync";
+function syncMerge(d){let n=0;["lifts","runs","body","templates","servings"].forEach(k=>(d[k]||[]).forEach(x=>{D[k]=D[k]||[];if(x.id&&!D[k].some(y=>y.id===x.id)){D[k].push(x);n++}}));
+["nutri","bio"].forEach(k=>(d[k]||[]).forEach(x=>{if(!x.id)return;const i=D[k].findIndex(y=>y.id===x.id);if(i<0){D[k].push(x);n++}else if(JSON.stringify(D[k][i])!==JSON.stringify(x)){D[k][i]=x;n++}}));return n}
+function syncCfg(){return JSON.parse(localStorage.getItem(SK)||"{}")}
+function syncStatus(){const c=syncCfg();$("syncStat").textContent=c.url?(c.last?"Last synced "+new Date(c.last).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"Not synced yet"):"Off";if(c.url&&!$("syncUrl").value)$("syncUrl").value=c.url}
+function setSync(){const u=$("syncUrl").value.trim();if(u&&!/^https:\/\/gist\.githubusercontent\.com\/[^/]+\/[0-9a-f]+\/raw\/[^/]+\.json$/i.test(u))return $("syncMsg").textContent="Use the raw URL without a commit id: https://gist.githubusercontent.com/<user>/<id>/raw/joe-data.json";
+const c=syncCfg();c.url=u;localStorage.setItem(SK,JSON.stringify(c));if(u)syncNow(true);else syncStatus()}
+async function syncNow(show){const c=syncCfg();if(!c.url)return;try{const r=await fetch(c.url+"?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const d=await r.json();const n=syncMerge(d);c.last=Date.now();localStorage.setItem(SK,JSON.stringify(c));save();if(show)$("syncMsg").textContent=n+" new/updated item(s)";}catch(e){$("syncMsg").textContent="Sync failed: "+e.message}syncStatus()}
+function render(){raceCountdown();syncStatus();{const td=today(),dy=D.nutri.find(x=>x.date===td),t=tgtFor(td),k=nv(dy,"kcal"),p=nv(dy,"prot");$("homeFood").innerHTML=`<h3>Today's nutrition</h3>`+bar("Calories",k,t.kcal," kcal")+bar("Protein",p,t.prot,"g")}
 if(!$("nDate").value)$("nDate").value=today();renderFood();
 $("bioTab").innerHTML="<tr><th>Date</th><th>Rest HR</th><th>Sleep</th><th>Weight</th></tr>"+[...D.bio].sort((a,b)=>a.date<b.date?1:-1).map(b=>`<tr><td>${b.date.slice(5)}</td><td>${b.rhr??""}</td><td>${b.sleep!=null?Math.floor(b.sleep)+"h "+String(Math.round(b.sleep%1*60)).padStart(2,"0")+"m":""}</td><td>${b.wt!=null?(+b.wt).toFixed(1):""}</td></tr>`).join("");const T0=today(),mon=monday(T0),wt=weekTasks(mon),dn=D.done||{};
 const wm=D.runs.filter(r=>monday(r.date)===mon).reduce((a,r)=>a+r.mi,0),pl=wt[0].plan;$("wkLbl").textContent=(wt[0].week?"Week "+wt[0].week+" · ":"")+mon.slice(5)+" to "+addD(mon,6).slice(5);
@@ -219,5 +231,5 @@ else{let mi=parseFloat(String(c[iDi]).replace(/[^\d.]/g,""))||0;if(/km/i.test(h[
 $("crEl").onchange=e=>{const fs=[...e.target.files];Promise.all(fs.map(f=>f.text().then(t=>{try{const [n,k]=cronoImport(t);return f.name+": "+n+" new ("+k+")"}catch(x){return f.name+": error"}}))).then(r=>{save();alert(r.join("\n"))});e.target.value=""};
 $("corEl").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=/\.csv$/i.test(f.name)?corosCSV(t):JSON.parse(t);const n=mergeData(d);save();alert("Imported "+n+" new item(s)")}catch(x){alert("Could not read file")}});e.target.value=""};
 $("impEl").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!d.lifts||!d.runs||!d.body)throw 0;d.templates=d.templates||[];d.done=d.done||{};["nutri","servings","bio"].forEach(k=>d[k]=d[k]||[]);d.targets=Object.assign(JSON.parse(JSON.stringify(TGT0)),d.targets||{});D=d;save();alert("Imported")}catch{alert("Invalid file")}})};
-$("rDate").value=$("bDate").value=today();newW();save();addEventListener("resize",render);
+$("rDate").value=$("bDate").value=today();newW();save();addEventListener("resize",render);syncNow(false);document.addEventListener("visibilitychange",()=>{if(!document.hidden)syncNow(false)});
 </script></body></html>
