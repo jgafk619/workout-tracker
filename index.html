@@ -1,0 +1,123 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f1115"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Goji"><link rel="apple-touch-icon" href="icon.png"><title>Goji Tracker</title>
+<style>
+:root{--bg:#0f1115;--card:#1a1d24;--txt:#e6e6e6;--mut:#8b93a1;--acc:#ff7a1a;--bd:#2a2f3a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,sans-serif;padding-bottom:70px}
+header{padding:12px 16px;font-weight:700;font-size:18px}h3{margin:6px 0}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd)}
+nav button{flex:1;padding:14px 0;background:none;border:0;color:var(--mut);font-size:14px}nav button.on{color:var(--acc)}
+section{display:none;padding:0 12px}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}
+input,select,textarea{background:#0b0d11;color:var(--txt);border:1px solid var(--bd);border-radius:8px;padding:9px;font-size:15px;width:100%}
+.row{display:flex;gap:6px;margin:5px 0;align-items:center}.row>*{flex:1}
+button.b{background:var(--acc);color:#000;border:0;border-radius:8px;padding:10px 12px;font-weight:600}
+button.g{background:#2a2f3a;color:var(--txt);border:0;border-radius:8px;padding:8px 10px}
+.x{flex:0 0 34px!important;background:#3a1f1f;color:#f88;border:0;border-radius:8px;padding:8px}
+.mut{color:var(--mut);font-size:13px}.big{font-size:28px;font-weight:700;color:var(--acc)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}table{width:100%;border-collapse:collapse}td,th{padding:5px;border-bottom:1px solid var(--bd);text-align:left;font-size:14px}
+</style></head><body>
+<header>🏃 Goji Tracker <span class="mut">Austin Marathon · sub-4:30</span></header>
+<section id="dash" class="on">
+<div class="grid"><div class="card"><div class="mut">Days to race</div><div class="big" id="dDays"></div></div>
+<div class="card"><div class="mut">Miles this week</div><div class="big" id="dWeek"></div></div></div>
+<div class="card"><h3>Weekly schedule</h3><table id="sched"></table></div>
+<div class="card"><h3>Weekly mileage</h3><canvas id="cMiles" height="160" style="width:100%"></canvas></div>
+<div class="card"><h3>Weight trend</h3><canvas id="cWt" height="160" style="width:100%"></canvas></div>
+<div class="card"><h3>Data</h3><div class="row"><button class="g" onclick="expJSON()">Export JSON</button><button class="g" onclick="impEl.click()">Import JSON</button></div>
+<div class="row"><button class="g" onclick="expCSV('lifts')">Lifts CSV</button><button class="g" onclick="expCSV('runs')">Runs CSV</button><button class="g" onclick="expCSV('body')">Body CSV</button></div>
+<input type="file" id="impEl" accept=".json" style="display:none"></div></section>
+<section id="lift"><div class="card"><h3>Templates</h3><select id="tSel"></select>
+<div class="row"><button class="b" onclick="startT()">Start session</button><button class="g" onclick="editT()">Edit</button><button class="x" onclick="delT()">✕</button></div>
+<div class="mut">New template: build exercises below, then "Save as template".</div></div>
+<div class="card"><h3>New / edit workout</h3><div class="mut" id="wMode" style="color:var(--acc)"></div>
+<div class="row"><input type="date" id="wDate"><input id="wName" placeholder="Name (e.g. Day 1 Full Body)"></div>
+<textarea id="wNote" placeholder="Notes" rows="2"></textarea>
+<div id="exList"></div>
+<div class="row"><input id="exIn" list="exPre" placeholder="Add exercise…"><button class="g" style="flex:0" onclick="addEx()">+Ex</button></div>
+<datalist id="exPre"></datalist>
+<div class="row"><button class="b" onclick="saveW()">Save workout</button><button class="g" onclick="saveT()">Save as template</button><button class="g" onclick="newW()">Clear</button></div></div>
+<div class="card"><h3>Exercise history</h3><select id="hSel" onchange="showHist()"></select><div id="hOut"></div></div>
+<div class="card"><h3>Workouts</h3><div id="wList"></div></div></section>
+<section id="run"><div class="card"><h3>Log run</h3>
+<div class="row"><input type="date" id="rDate"><select id="rType"><option>easy</option><option>speed</option><option>tempo</option><option>long</option></select></div>
+<div class="row"><input id="rMi" type="number" step="0.01" placeholder="Miles"><input id="rDur" placeholder="Duration h:mm:ss"><input id="rHr" type="number" placeholder="Avg HR"></div>
+<input id="rNote" placeholder="Notes"><div class="mut" id="rPace"></div>
+<div class="row"><button class="b" onclick="saveRun()">Save run</button></div></div>
+<div class="card"><table id="rTab"></table></div></section>
+<section id="body"><div class="card"><h3>Body stats</h3>
+<div class="row"><input type="date" id="bDate"><input id="bWt" type="number" step="0.1" placeholder="Weight lbs"><input id="bBf" type="number" step="0.1" placeholder="Body fat %"></div>
+<button class="b" onclick="saveBody()">Save</button></div><div class="card"><table id="bTab"></table></div></section>
+<nav><button class="on" data-s="dash">Home</button><button data-s="lift">Lifts</button><button data-s="run">Runs</button><button data-s="body">Body</button></nav>
+<script>
+const PRE=["Zercher squat","Romanian deadlift","Trap-bar deadlift","Walking lunge","Bulgarian split squat","Incline dumbbell press","Flat dumbbell press","Weighted pull-up","Pulldown","Chin-up","Chest-supported row","Machine row","Single-arm DB row","Cable row","Overhead press","Face pull","Reverse pec deck","Rear delt fly","Band pull-apart","Dumbbell curl","Hammer curl","Triceps pushdown","Overhead triceps extension","Reverse fly","Neutral pull-up","Incline DB fly","Dumbbell Lunges","Incline Dumbbell Bench Press","T-Bar Rows","Shoulder Press-Machine","Triceps Pushdowns","Dumbbell Biceps Curls","Machine Crunches","Hanging Leg Raise","Pull-ups","Reverse Flys With Bands"];
+const RACE=new Date(2027,1,14),KEY="gojiTracker";
+const $=id=>document.getElementById(id),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6),today=()=>new Date().toLocaleDateString("en-CA");
+const T=(n,a)=>({name:n,sets:Array.from({length:a[0]},()=>({r:a[1],w:"",rpe:a[2]??""}))});
+const W=(n,k,r,w)=>({name:n,sets:Array.from({length:k},()=>({r,w,rpe:""}))});
+const OLD_T=[{id:"seed-t-d1",name:"Full body Day 1",ex:[T("Zercher squat",[2,8,6.5]),T("Romanian deadlift",[2,8,6.5]),T("Incline dumbbell press",[3,8]),T("Weighted pull-up",[3,8]),T("Flat dumbbell press",[2,10]),T("Chest-supported row",[2,10]),T("Overhead press",[2,8]),T("Face pull",[2,12]),T("Dumbbell curl",[2,10]),T("Triceps pushdown",[2,10])]},
+{id:"seed-t-d2",name:"Full Body Day 2",ex:[T("Romanian deadlift",[2,6,6.5]),T("Walking lunge",[2,8,6.5]),T("Flat dumbbell press",[3,8]),T("Single-arm DB row",[3,8]),T("Incline dumbbell press",[2,8]),T("Chin-up",[3,6]),T("Overhead press",[2,8]),T("Reverse fly",[2,12]),T("Hammer curl",[2,10]),T("Triceps pushdown",[2,10])]}];
+const SEED={lifts:[],runs:[],body:[],
+templates:[{id:"seed-t-d1-v2",name:"Full body Day 1",ex:[W("Zercher Squat",2,8,70),W("Dumbbell Lunges",2,8,35),W("Incline Dumbbell Bench Press",4,8,75),W("T-Bar Rows",4,8,100),W("Shoulder Press-Machine",4,8,70),W("Triceps Pushdowns",2,10,120),W("Dumbbell Biceps Curls",2,8,35),W("Machine Crunches",2,10,165),W("Hanging Leg Raise",2,8,0)]},
+{id:"seed-t-d2-v2",name:"Full Body Day 2",ex:[W("Romanian Deadlift",2,8,70),W("Zercher Squat",2,8,70),W("Incline Dumbbell Bench Press",4,8,75),W("Pull-ups",4,8,35),W("Shoulder Press-Machine",4,8,40),W("Triceps Pushdowns",2,8,120),W("Dumbbell Biceps Curls",2,10,35),W("Machine Crunches",2,10,165),W("Reverse Flys With Bands",2,10,40)]}]};
+let D=JSON.parse(localStorage.getItem(KEY)||"null")||{};
+if(D.templates)OLD_T.forEach(o=>{const t=D.templates.find(x=>x.id===o.id);if(t&&JSON.stringify({n:t.name,e:t.ex})===JSON.stringify({n:o.name,e:o.ex}))D.templates=D.templates.filter(x=>x!==t)});
+for(const k in SEED){D[k]=D[k]||[];const del=JSON.parse(localStorage.getItem(KEY+"-deleted")||"[]");SEED[k].forEach(x=>{if(!D[k].some(y=>y.id===x.id)&&!del.includes(x.id))D[k].push(JSON.parse(JSON.stringify(x)))})}
+const save=()=>{localStorage.setItem(KEY,JSON.stringify(D));render()};
+const parseDur=s=>{const p=String(s).trim().split(":").map(Number);if(p.some(isNaN))return 0;return p.reduce((a,b)=>a*60+b,0)};
+const fmt=s=>{s=Math.round(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+":"+String(m).padStart(2,"0"):m)+":"+String(x).padStart(2,"0")};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const e1rm=(w,r)=>r>0&&w>0?w*(1+r/30):0;
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button,section").forEach(e=>e.classList.remove("on"));b.classList.add("on");$(b.dataset.s).classList.add("on");render()});
+// lifts
+let cur;function newW(){cur={id:null,ex:[]};$("wMode").textContent="";$("wDate").value=today();$("wName").value="";$("wNote").value="";drawEx()}
+function addEx(){const n=$("exIn").value.trim();if(!n)return;cur.ex.push({name:n,sets:[{r:"",w:"",rpe:""}]});$("exIn").value="";drawEx()}
+function drawEx(){$("exList").innerHTML=cur.ex.map((e,i)=>`<div class="card"><div class="row"><b>${esc(e.name)}</b><button class="x" onclick="cur.ex.splice(${i},1);drawEx()">✕</button></div>
+<div class="row mut"><span>Reps</span><span>Lbs</span><span>RPE</span><span style="flex:0 0 34px"></span></div>
+${e.sets.map((s,j)=>`<div class="row"><input type="number" inputmode="numeric" value="${s.r}" oninput="cur.ex[${i}].sets[${j}].r=this.value"><input type="number" inputmode="decimal" value="${s.w}" oninput="cur.ex[${i}].sets[${j}].w=this.value"><input type="number" step="0.5" value="${s.rpe}" oninput="cur.ex[${i}].sets[${j}].rpe=this.value"><button class="x" onclick="cur.ex[${i}].sets.splice(${j},1);drawEx()">✕</button></div>`).join("")}
+<button class="g" onclick="const s=cur.ex[${i}].sets;s.push({...(s[s.length-1]||{r:'',w:'',rpe:''})});drawEx()">+ Set</button></div>`).join("")}
+function startT(){const t=D.templates.find(x=>x.id===$("tSel").value);if(!t)return;newW();cur.ex=JSON.parse(JSON.stringify(t.ex));$("wName").value=t.name;drawEx();$("wMode").textContent="Session from template: "+t.name}
+function editT(){const t=D.templates.find(x=>x.id===$("tSel").value);if(!t)return;newW();cur=JSON.parse(JSON.stringify(t));cur.tpl=t.id;$("wName").value=t.name;drawEx();$("wMode").textContent="Editing TEMPLATE: "+t.name+" (Save template to keep changes)"}
+function saveT(){const n=$("wName").value.trim();if(!n)return alert("Give the template a name");const id=cur.tpl||uid();D.templates=D.templates.filter(x=>x.id!==id);D.templates.push({id,name:n,ex:cur.ex.map(e=>({name:e.name,sets:e.sets.map(s=>({r:s.r,w:s.w,rpe:s.rpe??""}))}))});newW();save();$("tSel").value=id}
+function delT(){const id=$("tSel").value;if(id)delItem("templates",id)}
+function saveW(){if(cur.tpl)return saveT();const w={id:cur.id||uid(),date:$("wDate").value||today(),name:$("wName").value,note:$("wNote").value,ex:cur.ex.map(e=>({name:e.name,sets:e.sets.filter(s=>s.r||s.w).map(s=>({r:+s.r||0,w:+s.w||0,rpe:s.rpe===""?null:+s.rpe}))}))};
+D.lifts=D.lifts.filter(x=>x.id!==w.id);D.lifts.push(w);newW();save()}
+function editW(id){const w=D.lifts.find(x=>x.id===id);cur=JSON.parse(JSON.stringify(w));cur.ex.forEach(e=>e.sets.forEach(s=>{if(s.rpe==null)s.rpe=""}));$("wDate").value=w.date;$("wName").value=w.name;$("wNote").value=w.note;drawEx();scrollTo(0,0)}
+function delItem(k,id){if(confirm("Delete?")){D[k]=D[k].filter(x=>x.id!==id);if(id.startsWith("seed-")){const d=JSON.parse(localStorage.getItem(KEY+"-deleted")||"[]");d.push(id);localStorage.setItem(KEY+"-deleted",JSON.stringify(d))}save()}}
+function allEx(){return [...new Set([...PRE,...D.lifts.flatMap(w=>w.ex.map(e=>e.name))])]}
+function showHist(){const n=$("hSel").value;const ss=D.lifts.filter(w=>w.ex.some(e=>e.name===n)).sort((a,b)=>a.date<b.date?1:-1);
+if(!ss.length){$("hOut").innerHTML='<p class="mut">No sessions yet.</p>';return}
+let best=0,b1=0;ss.forEach(w=>w.ex.filter(e=>e.name===n).forEach(e=>e.sets.forEach(s=>{best=Math.max(best,s.w);b1=Math.max(b1,e1rm(s.w,s.r))})));
+const last=ss[0],ls=last.ex.filter(e=>e.name===n).flatMap(e=>e.sets);
+$("hOut").innerHTML=`<p>Last (${last.date}): ${ls.map(s=>s.r+"×"+s.w+(s.rpe!=null?" @"+s.rpe:"")).join(", ")}</p><p>Best weight: <b>${best} lbs</b> · Est 1RM: <b>${Math.round(b1)} lbs</b></p>
+<table>${ss.map(w=>`<tr><td>${w.date}</td><td>${w.ex.filter(e=>e.name===n).flatMap(e=>e.sets).map(s=>s.r+"×"+s.w).join(", ")}</td></tr>`).join("")}</table>`}
+// runs
+function rp(){const m=+$("rMi").value,s=parseDur($("rDur").value);$("rPace").textContent=m&&s?"Pace: "+fmt(s/m)+"/mi":""}
+$("rMi").oninput=$("rDur").oninput=rp;
+function saveRun(){const mi=+$("rMi").value,sec=parseDur($("rDur").value);if(!mi)return alert("Enter miles");D.runs.push({id:uid(),date:$("rDate").value||today(),type:$("rType").value,mi,sec,hr:+$("rHr").value||null,note:$("rNote").value});["rMi","rDur","rHr","rNote"].forEach(i=>$(i).value="");rp();save()}
+function saveBody(){const wt=+$("bWt").value;if(!wt)return alert("Enter weight");D.body.push({id:uid(),date:$("bDate").value||today(),wt,bf:+$("bBf").value||null});$("bWt").value=$("bBf").value="";save()}
+// charts
+function chart(cv,labels,vals,bar){const r=devicePixelRatio||1,W=cv.clientWidth||300,H=160;cv.width=W*r;cv.height=H*r;const c=cv.getContext("2d");c.scale(r,r);c.clearRect(0,0,W,H);c.font="11px system-ui";c.fillStyle="#8b93a1";
+if(!vals.length){c.fillText("No data yet",10,80);return}const mx=Math.max(...vals),mn=bar?0:Math.min(...vals)-1,rg=(mx-mn)||1,pl=30,pb=20,w=(W-pl)/vals.length;
+c.fillText(mx.toFixed(1),0,12);c.fillText(mn.toFixed(bar?0:1),0,H-pb);c.fillStyle=c.strokeStyle="#ff7a1a";c.lineWidth=2;c.beginPath();
+vals.forEach((v,i)=>{const x=pl+i*w,y=H-pb-(v-mn)/rg*(H-pb-15);if(bar)c.fillRect(x+3,y,w-6,H-pb-y);else{i?c.lineTo(x+w/2,y):c.moveTo(x+w/2,y);c.fillRect(x+w/2-2,y-2,4,4)}});if(!bar)c.stroke();
+c.fillStyle="#8b93a1";labels.forEach((l,i)=>{if(vals.length<=8||i%Math.ceil(vals.length/8)==0)c.fillText(l,pl+i*w+2,H-5)})}
+const monday=d=>{const x=new Date(d+"T12:00");x.setDate(x.getDate()-(x.getDay()+6)%7);return x.toLocaleDateString("en-CA")};
+const SCH=[["Sun","Full body Day 1 (lift)"],["Mon","Easy run"],["Tue","Speed run"],["Wed","Full Body Day 2 (lift)"],["Thu","Tempo run"],["Fri","Rest"],["Sat","Long run"]];
+function render(){const dw=new Date().getDay();$("sched").innerHTML=SCH.map((x,i)=>`<tr style="${i===dw?"color:var(--acc);font-weight:700":""}"><td>${x[0]}</td><td>${x[1]}</td></tr>`).join("");
+const tv=$("tSel").value;$("tSel").innerHTML=D.templates.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("");if(tv&&D.templates.some(t=>t.id===tv))$("tSel").value=tv;const now=new Date();now.setHours(0,0,0,0);$("dDays").textContent=Math.max(0,Math.round((RACE-now)/864e5));
+const wk={};D.runs.forEach(r=>{const k=monday(r.date);wk[k]=(wk[k]||0)+r.mi});$("dWeek").textContent=(wk[monday(today())]||0).toFixed(1);
+const ks=Object.keys(wk).sort().slice(-12);chart($("cMiles"),ks.map(k=>k.slice(5)),ks.map(k=>wk[k]),1);
+const bs=[...D.body].sort((a,b)=>a.date<b.date?-1:1);chart($("cWt"),bs.map(b=>b.date.slice(5)),bs.map(b=>b.wt),0);
+$("exPre").innerHTML=allEx().map(n=>`<option value="${esc(n)}">`).join("");const hv=$("hSel").value;$("hSel").innerHTML=allEx().map(n=>`<option>${esc(n)}</option>`).join("");if(hv)$("hSel").value=hv;showHist();
+$("wList").innerHTML=[...D.lifts].sort((a,b)=>a.date<b.date?1:-1).map(w=>`<div class="card"><div class="row"><b>${w.date} · ${esc(w.name)}</b><button class="g" style="flex:0" onclick="editW('${w.id}')">Edit</button><button class="x" onclick="delItem('lifts','${w.id}')">✕</button></div>${w.note?`<div class="mut">${esc(w.note)}</div>`:""}${w.ex.map(e=>`<div>${esc(e.name)}: ${e.sets.map(s=>s.r+"×"+s.w).join(", ")}</div>`).join("")}</div>`).join("");
+$("rTab").innerHTML="<tr><th>Date</th><th>Type</th><th>Mi</th><th>Time</th><th>Pace</th><th>HR</th><th></th></tr>"+[...D.runs].sort((a,b)=>a.date<b.date?1:-1).map(r=>`<tr title="${esc(r.note)}"><td>${r.date.slice(5)}</td><td>${r.type}</td><td>${r.mi}</td><td>${fmt(r.sec)}</td><td>${r.sec?fmt(r.sec/r.mi):""}</td><td>${r.hr||""}</td><td><button class="x" onclick="delItem('runs','${r.id}')">✕</button></td></tr>`).join("");
+$("bTab").innerHTML="<tr><th>Date</th><th>Lbs</th><th>BF%</th><th></th></tr>"+[...bs].reverse().map(b=>`<tr><td>${b.date}</td><td>${b.wt}</td><td>${b.bf||""}${b.note?` <span class="mut">(${esc(b.note)})</span>`:""}</td><td><button class="x" onclick="delItem('body','${b.id}')">✕</button></td></tr>`).join("")}
+function dl(name,txt,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click()}
+function expJSON(){dl("goji-tracker.json",JSON.stringify(D,null,2),"application/json")}
+function expCSV(k){const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';let rows;
+if(k==="lifts"){rows=[["date","workout","exercise","set","reps","weight_lbs","rpe"]];D.lifts.forEach(w=>{if(!w.ex.length)rows.push([w.date,w.name,"","","","",""]);w.ex.forEach(e=>e.sets.forEach((s,i)=>rows.push([w.date,w.name,e.name,i+1,s.r,s.w,s.rpe])))})}
+else if(k==="runs"){rows=[["date","type","miles","duration","pace_per_mi","avg_hr","notes"]];D.runs.forEach(r=>rows.push([r.date,r.type,r.mi,fmt(r.sec),r.sec?fmt(r.sec/r.mi):"",r.hr,r.note]))}
+else{rows=[["date","weight_lbs","body_fat_pct"]];D.body.forEach(b=>rows.push([b.date,b.wt,b.bf]))}
+dl(k+".csv",rows.map(r=>r.map(q).join(",")).join("\n"),"text/csv")}
+$("impEl").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);if(!d.lifts||!d.runs||!d.body)throw 0;d.templates=d.templates||[];D=d;save();alert("Imported")}catch{alert("Invalid file")}})};
+$("rDate").value=$("bDate").value=today();newW();save();addEventListener("resize",render);
+</script></body></html>
